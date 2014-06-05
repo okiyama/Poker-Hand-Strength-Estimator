@@ -31,4 +31,4 @@ void printHand(char* hand, int size);
 //  6 - full house
 //  7 - four of a kind
 //  8 - straight flush
-int getHandRank(char* hand);
+int getHandRank(char* hand, int* tieBreaker);
