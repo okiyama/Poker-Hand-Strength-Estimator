@@ -176,6 +176,8 @@ int main(int argc, char* argv[])
                 break;
         }
         localNumTests++;
+        free(localHand);
+        free(localDeck);
     }
     double testEndTime = MPI_Wtime();
 
@@ -196,6 +198,8 @@ int main(int argc, char* argv[])
 
     MPI_Type_free(&resultsDatatype);
     MPI_Type_free(&deckHandDatatype);
+    free(masterDeck);
+    free(masterHand);
 
     MPI_Finalize();
     return 0;

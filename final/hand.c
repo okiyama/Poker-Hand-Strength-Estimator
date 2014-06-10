@@ -68,9 +68,11 @@ int getNOfAKind(int* sortedValues, int handSize, int n)
     for(int i = 0; i < NUM_VALUES; i++) {
         if(numOfValues[i] == n)
         {
+            free(numOfValues);
             return i;
         }
     }
+    free(numOfValues);
     return -1;
 }
 
@@ -137,6 +139,7 @@ int getNumPairs(int* sortedValues, int* tieBreaker, int handSize)
             *tieBreaker = i;
         }
     }
+    free(numInValues);
     return numPairs;
 }
 
@@ -174,6 +177,8 @@ int getHandRank(char* hand, int* tieBreaker)
 //    printf("Just got four of a kind\n");
     if(hasFourOfAKind != -1) {
         *tieBreaker = hasFourOfAKind;
+        free(suits);
+        free(sortedValues);
         return 7;
     }
     //Immediately return 7
@@ -184,16 +189,22 @@ int getHandRank(char* hand, int* tieBreaker)
     //Now, we can return 8 if both straight and flush were there,
     if(hasStraight != -1 && hasFlush != -1) {
         *tieBreaker = hasStraight;
+        free(sortedValues);
+        free(suits);
         return 8;
     }
     int hasThreeOfAKind = getThreeOfAKind(sortedValues, HAND_SIZE);
 //    printf("just got 3 of a kind\n");
     if(hasThreeOfAKind == -1 && hasFlush != -1) {
         *tieBreaker = hasFlush;
+        free(sortedValues);
+        free(suits);
         return 5;
     }
     if(hasThreeOfAKind == -1 && hasStraight != -1) {
         *tieBreaker = hasStraight;
+        free(sortedValues);
+        free(suits);
         return 4;
     }
     //If no 3 of a kind, and we have flush, return 5
@@ -202,12 +213,18 @@ int getHandRank(char* hand, int* tieBreaker)
 //    printf("just got num pairs\n");
     if(hasThreeOfAKind != -1 && numPairs == 1) {
         *tieBreaker = hasThreeOfAKind;
+        free(sortedValues);
+        free(suits);
         return 3;
     }
     if(hasThreeOfAKind != -1 && numPairs == 2) {
         *tieBreaker = hasThreeOfAKind;
+        free(sortedValues);
+        free(suits);
         return 6;
     }
+    free(sortedValues);
+    free(suits);
     if(numPairs == 2) {
         return 2;
     }

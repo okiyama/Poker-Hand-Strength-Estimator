@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
     double programStartTime = MPI_Wtime();
     char* masterHand = malloc(HAND_SIZE * sizeof(char));
     char* masterDeck = malloc(DECK_SIZE * sizeof(char)); 
-    char* localHand = malloc(HAND_SIZE * sizeof(char));
-    char* localDeck = malloc(DECK_SIZE * sizeof(char)); 
+    char* localHand;
+    char* localDeck; 
 
     //Have root node generate a deck and master hand for nodes to use
     if(myRank == 0) {
@@ -129,6 +129,8 @@ int main(int argc, char* argv[])
                 break;
         }
         localNumTests++;
+        free(localHand);
+        free(localDeck);
     }
     double testEndTime = MPI_Wtime();
 
@@ -147,6 +149,8 @@ int main(int argc, char* argv[])
         printf("The program took a total of %f seconds to run whereas the tests took %f seconds to run!\n", programEndTime - programStartTime, testEndTime - testStartTime);
     }
 
+    free(masterDeck);
+    free(masterHand);
     MPI_Finalize();
     return 0;
 }

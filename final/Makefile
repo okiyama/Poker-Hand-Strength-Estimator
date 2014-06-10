@@ -7,6 +7,9 @@ MAINS = mainBasic.o mainDerived.o
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+debug: $(OBJ) mainBasic.o
+	$(CC) -g -o pokerDebug $^ $(CFLAGS)
+
 basic: $(OBJ) mainBasic.o
 	$(CC) -o pokerBasic $^ $(CFLAGS)
 
