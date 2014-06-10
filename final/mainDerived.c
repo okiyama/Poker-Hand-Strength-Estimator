@@ -15,7 +15,7 @@
 #include <stdio.h>
 
 #define NUM_TESTS 5000000
-#define NUM_SEC_TO_RUN 30
+#define NUM_SEC_TO_RUN 60
 
 //Tests out the functions
 void testFunctions()
