@@ -163,30 +163,19 @@ int getNumPairs(int* sortedValues, int* tieBreaker, int handSize)
 int getHandRank(char* hand, int* tieBreaker)
 {
     int* sortedValues = getValues(hand, HAND_SIZE);
-//    printf("unsorted[0,1,2,3,4]: %d,%d,%d,%d,%d\n", sortedValues[0], 
-//        sortedValues[1], sortedValues[2], sortedValues[3], sortedValues[4]);
-//    printf("just got values.\n");
     qsort(sortedValues, HAND_SIZE, sizeof(int), intcmp);
-//    printf("sorted[0,1,2,3,4]: %d,%d,%d,%d,%d\n", sortedValues[0], 
-//        sortedValues[1], sortedValues[2], sortedValues[3], sortedValues[4]);
 
     int* suits = getSuits(hand, HAND_SIZE);
-//    printf("Just got suits\n");
 
     int hasFourOfAKind = getFourOfAKind(sortedValues, HAND_SIZE);
-//    printf("Just got four of a kind\n");
     if(hasFourOfAKind != -1) {
         *tieBreaker = hasFourOfAKind;
         free(suits);
         free(sortedValues);
         return 7;
     }
-    //Immediately return 7
     int hasStraight = getStraight(sortedValues, HAND_SIZE);
-//    printf("just got straight\n");
     int hasFlush = getFlush(suits, sortedValues, HAND_SIZE);
-//    printf("just got flush\n");
-    //Now, we can return 8 if both straight and flush were there,
     if(hasStraight != -1 && hasFlush != -1) {
         *tieBreaker = hasStraight;
         free(sortedValues);
@@ -194,7 +183,6 @@ int getHandRank(char* hand, int* tieBreaker)
         return 8;
     }
     int hasThreeOfAKind = getThreeOfAKind(sortedValues, HAND_SIZE);
-//    printf("just got 3 of a kind\n");
     if(hasThreeOfAKind == -1 && hasFlush != -1) {
         *tieBreaker = hasFlush;
         free(sortedValues);
@@ -207,10 +195,7 @@ int getHandRank(char* hand, int* tieBreaker)
         free(suits);
         return 4;
     }
-    //If no 3 of a kind, and we have flush, return 5
-    //if no 3 of a kind and we have straight, return 4
     int numPairs = getNumPairs(sortedValues, tieBreaker, HAND_SIZE);
-//    printf("just got num pairs\n");
     if(hasThreeOfAKind != -1 && numPairs == 1) {
         *tieBreaker = hasThreeOfAKind;
         free(sortedValues);
@@ -235,11 +220,6 @@ int getHandRank(char* hand, int* tieBreaker)
         *tieBreaker = sortedValues[HAND_SIZE-1];
         return 0;
     }
-    //if we have 3 of a kind and numPairs == 1, return 3
-    //else if we have 3 of a kind and numPairs == 2, return 6
-    //if numPairs == 2, return 2
-    //elif numPairs == 1, return 1
-    //else return 0
 }
 
 //Returns which hand wins out of two given hands.
@@ -250,11 +230,8 @@ int testHands(char* hand1, char* hand2)
 {
     int tieBreak1 = 0;
     int tieBreak2 = 0;
-//    printf("Getting hand 1 rank\n");
     int hand1Rank = getHandRank(hand1, &tieBreak1);
-//    printf("Getting hand 2 rank\n");
     int hand2Rank = getHandRank(hand2, &tieBreak2);
-//    printf("rank1: %d, rank2: %d\n", hand1Rank, hand2Rank);
     if(hand1Rank == hand2Rank) {
         if(tieBreak1 > tieBreak2) { return -1; }
         else if(tieBreak1 < tieBreak2) { return 1; }
