@@ -21,12 +21,6 @@ int getValue(char card)
     return card % NUM_VALUES;
 }
 
-//Generates a random card. Assumes that srand() has already been called.
-char generateRandomCard();
-
-//Creates a card with the given suit and value
-char createCard(int suit, int value);
-
 //Prints the value out in a nice way
 void prettyPrintValue(int value)
 {

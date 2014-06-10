@@ -14,18 +14,8 @@ int getDeckSize(char* deck);
 //Creates a deck in new deck order
 char* createOrderedDeck();
 
-//Creates a deck in a random order
-char* createRandDeck();
-
-//Removes card at the given index into the deck
-//Returns resulting deck
-char* removeCard(char* deck, int position);
-
 //Deals a random card from the deck
 char dealRandomCard(char* deck);
-
-//Deals top card of the deck
-char dealCard(char* deck);
 
 //Returns a copy of the given deck and the deck size to copy
 char* getDeckCopy(char* deck, int size);

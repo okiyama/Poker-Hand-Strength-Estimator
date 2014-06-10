@@ -35,11 +35,5 @@ int getSuit(char card);
 //Returns the value of the card, 0-12
 int getValue(char card);
 
-//Generates a random card. Assumes that srand() has already been called.
-char generateRandomCard();
-
-//Creates a card with the given suit and value
-char createCard(int suit, int value);
-
 //Prints out a card in an attractive way.
 void printCard(char card);

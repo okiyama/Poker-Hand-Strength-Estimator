@@ -34,13 +34,6 @@ char* createOrderedDeck()
     return deck;
 }
 
-//Creates a deck in a random order
-char* createRandDeck();
-
-//Removes card at the given index into the deck
-//Returns resulting deck
-char* removeCard(char* deck, int position);
-
 //Helper function, given a deck, the size of the deck and a position, 
 //shifts all cards to the right of the given position over 1. 
 //Sets the last card to be NULL_CARD.
@@ -62,9 +55,6 @@ char dealRandomCard(char* deck)
     shiftLeft(deck, pos, size);
     return card;
 }
-
-//Deals top card of the deck
-char dealCard(char* deck);
 
 //Returns a copy of the given deck with the given deck size
 char* getDeckCopy(char* deck, int size)
