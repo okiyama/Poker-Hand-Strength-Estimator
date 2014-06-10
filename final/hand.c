@@ -60,37 +60,42 @@ int intcmp(const void *aa, const void *bb)
     return (*a < *b) ? -1 : (*a > *b);
 }
 
-//Returns -1 if this hand doesn't have a three of a kind, otherwise
-//returns the card value of the three of a kind.
-int getThreeOfAKind(int* sortedValues, int handSize)
+//Gets the largest N of a kind out of the given hand and returns the value of it
+//Returns -1 if there is not one.
+int getNOfAKind(int* sortedValues, int handSize, int n)
 {
-    if(sortedValues[0] == sortedValues[1] && sortedValues[2] == sortedValues[3] &&
-            sortedValues[1] == sortedValues[2]) {
-        return sortedValues[0];
-    }
-    else if((sortedValues[1] == sortedValues[2] && 
-                sortedValues[3] == sortedValues[4] && 
-                sortedValues[2] == sortedValues[3])) {
-        return sortedValues[1];
+    int* numOfValues = getNumOfValuesArray(sortedValues, handSize);
+    for(int i = 0; i < NUM_VALUES; i++) {
+        if(numOfValues[i] == n)
+        {
+            return i;
+        }
     }
     return -1;
 }
 
+//Returns -1 if this hand doesn't have a three of a kind, otherwise
+//returns the card value of the three of a kind.
+int getThreeOfAKind(int* sortedValues, int handSize)
+{
+    return getNOfAKind(sortedValues, handSize, 3);
+}
+
 //Returns -1 if this hand doesn't have a four of a kind, otherwise
 //returns the card value of the four of a kind.
-//
-//TODO: This is three of a kind! Make 4 of a kind!!
 int getFourOfAKind(int* sortedValues, int handSize)
 {
-
+    return getNOfAKind(sortedValues, handSize, 4);
 }
 
 //Returns -1 if this hand doesn't have a straight, otherwise
 //returns the card value of the highest card in the straight.
 int getStraight(int* sortedValues, int handSize)
 {
-    for(int i = 0; i < handSize; i++) {
-        if(sortedValues[i + 1] - sortedValues[i] != 1) {
+    int difference = 0;
+    for(int i = 0; i < handSize - 1; i++) {
+        difference = sortedValues[i + 1] - sortedValues[i];
+        if(difference != 1) {
             return -1;
         }
     }
@@ -149,9 +154,9 @@ int getNumPairs(int* sortedValues, int* tieBreaker, int handSize)
 //  7 - four of a kind
 //  8 - straight flush
 //
-//  Also sets the tieBreaker variable to the appropriate value.
-//  This will be used in case the rank of two hands is equal, the tie breaker value
-//  can be used to determine the true winner.
+// Also sets the tieBreaker variable to the appropriate value.
+// This will be used in case the rank of two hands is equal, the tie breaker value
+// can be used to determine the true winner.
 int getHandRank(char* hand, int* tieBreaker)
 {
     int* sortedValues = getValues(hand, HAND_SIZE);
@@ -161,7 +166,6 @@ int getHandRank(char* hand, int* tieBreaker)
     qsort(sortedValues, HAND_SIZE, sizeof(int), intcmp);
 //    printf("sorted[0,1,2,3,4]: %d,%d,%d,%d,%d\n", sortedValues[0], 
 //        sortedValues[1], sortedValues[2], sortedValues[3], sortedValues[4]);
-//    printf("Just sorted\n");
 
     int* suits = getSuits(hand, HAND_SIZE);
 //    printf("Just got suits\n");
@@ -233,6 +237,7 @@ int testHands(char* hand1, char* hand2)
     int hand1Rank = getHandRank(hand1, &tieBreak1);
 //    printf("Getting hand 2 rank\n");
     int hand2Rank = getHandRank(hand2, &tieBreak2);
+//    printf("rank1: %d, rank2: %d\n", hand1Rank, hand2Rank);
     if(hand1Rank == hand2Rank) {
         if(tieBreak1 > tieBreak2) { return -1; }
         else if(tieBreak1 < tieBreak2) { return 1; }

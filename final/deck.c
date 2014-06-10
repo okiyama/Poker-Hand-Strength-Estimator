@@ -69,7 +69,7 @@ char dealCard(char* deck);
 //Returns a copy of the given deck with the given deck size
 char* getDeckCopy(char* deck, int size)
 {
-    printf("about to copy\n");
+//    printf("about to copy\n");
     char* newDeck = malloc((size + 1) * sizeof(char));
     if(newDeck == NULL)
     {

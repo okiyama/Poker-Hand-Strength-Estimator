@@ -1,5 +1,6 @@
 /*
  * Main method for parallel monte carlo estimation of poker hand strength.
+ * Uses only basic MPI datatypes for communication.
  * Author: Julian
  *
  */

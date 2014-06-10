@@ -1,5 +1,7 @@
 /*
  * Main method for parallel monte carlo estimation of poker hand strength.
+ * Uses derived datatypes to send the deck and the hand at the same time as well as
+ * using derived data types to send the results of a hand.
  * Author: Julian
  *
  */
@@ -69,6 +71,47 @@ void testFunctions()
     //printf("Result is %d!\n", testHands(hand1, hand2));
 }
 
+/*
+ * Builds the data type for the deck/hand datatype
+ * Builds it onto the variable deckHandDatatype
+ */
+void buildDeckHandDatatype(char* deck, char* hand, MPI_Datatype* deckHandDatatype)
+{
+    int blockLengthArray[2] = {DECK_SIZE + 1, HAND_SIZE};
+    MPI_Datatype typeArray[2] = {MPI_CHAR, MPI_CHAR};
+    MPI_Aint deckAddr, handAddr;
+    MPI_Aint displacementArray[2] = {0};
+
+    MPI_Get_address(deck, &deckAddr);
+    MPI_Get_address(hand, &handAddr);
+
+    displacementArray[1] = handAddr - deckAddr;
+
+    MPI_Type_create_struct(2, blockLengthArray, displacementArray, typeArray, deckHandDatatype);
+    MPI_Type_commit(deckHandDatatype);
+}
+
+/*
+ * Builds the data type for the results datatype
+ * Builds it onto the variable resultsDatatype
+ */
+void buildResultsDatatype(int* numWins, int* numTies, int* numLosses, MPI_Datatype* resultsDatatype)
+{
+    int blockLengthArray[3] = {1, 1, 1};
+    MPI_Datatype typeArray[3] = {MPI_INT, MPI_INT, MPI_INT};
+    MPI_Aint winAddr, tiesAddr, lossAddr;
+    MPI_Aint displacementArray[3] = {0};
+
+    MPI_Get_address(numWins, &winAddr);
+    MPI_Get_address(numTies, &tiesAddr);
+    MPI_Get_address(numLosses, &lossAddr);
+
+    displacementArray[1] = tiesAddr - winAddr;
+    displacementArray[2] = lossAddr - winAddr;
+
+    MPI_Type_create_struct(3, blockLengthArray, displacementArray, typeArray, resultsDatatype);
+    MPI_Type_commit(resultsDatatype);
+}
 
 int main(int argc, char* argv[])
 {
@@ -86,6 +129,9 @@ int main(int argc, char* argv[])
     char* masterDeck = malloc(DECK_SIZE * sizeof(char)); 
     char* localHand = malloc(HAND_SIZE * sizeof(char));
     char* localDeck = malloc(DECK_SIZE * sizeof(char)); 
+    MPI_Datatype deckHandDatatype;
+
+    buildDeckHandDatatype(masterDeck, masterHand, &deckHandDatatype);
 
     //Have root node generate a deck and master hand for nodes to use
     if(myRank == 0) {
@@ -93,9 +139,8 @@ int main(int argc, char* argv[])
         masterHand = getRandHand(masterDeck, HAND_SIZE);
     }
 
-    //Broadcast out the hand and deck we are using
-    MPI_Bcast(masterHand, HAND_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
-    MPI_Bcast(masterDeck, DECK_SIZE - HAND_SIZE + 1, MPI_CHAR, 0, MPI_COMM_WORLD);
+    //Broadcast out the hand and deck we are using with a derived datatype
+    MPI_Bcast(masterDeck, 1, deckHandDatatype, 0, MPI_COMM_WORLD);
 
 
     int globalWins = 0;
@@ -106,6 +151,9 @@ int main(int argc, char* argv[])
     int localTies = 0;
     int localLosses = 0;
     int result = 0;
+    MPI_Datatype resultsDatatype;
+    buildResultsDatatype(&localWins, &localTies, &localLosses, &resultsDatatype);
+
     double testStartTime = MPI_Wtime();
     for(int i = 0; i < NUM_TESTS / p; i++) {
         //Although inefficient, this makes the simulation much more realistic
@@ -127,7 +175,7 @@ int main(int argc, char* argv[])
     }
     double testEndTime = MPI_Wtime();
 
-
+    //I tried to use a derived data type here, but reduce doesn't work for non-simplified data types.
     MPI_Reduce(&localWins, &globalWins, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce(&localLosses, &globalLosses, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce(&localTies, &globalTies, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
@@ -141,6 +189,9 @@ int main(int argc, char* argv[])
         printf("\nOut of %d tests on %d nodes, the hand won %d games, lost %d games and tied %d games.\n Which is a %f percent win rate!\n", NUM_TESTS, p, globalWins, globalLosses, globalTies, winRate);
         printf("The program took a total of %f seconds to run whereas the tests took %f seconds to run!\n", programEndTime - programStartTime, testEndTime - testStartTime);
     }
+
+    MPI_Type_free(&resultsDatatype);
+    MPI_Type_free(&deckHandDatatype);
 
     MPI_Finalize();
     return 0;
