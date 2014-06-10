@@ -1,0 +1,18 @@
+Queen high - 3%
+Ace high 10%
+pair of twos 14%
+pair of twos 14%
+pair of eights 21%
+Ace high 10%
+pair of aces 28%
+pair of threes 15%
+king high 5.7%
+pair of 10s 24%
+royal flush 100%
+7 high 0%
+Ace high 10%
+8 high 0.03%
+King high 5%
+pair of jacks 25%
+9 high 0.17%
+pair of kings 27%
