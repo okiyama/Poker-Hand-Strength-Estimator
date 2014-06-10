@@ -15,6 +15,7 @@
 #include <stdio.h>
 
 #define NUM_TESTS 5000000
+#define NUM_SEC_TO_RUN 30
 
 //Tests out the functions
 void testFunctions()
@@ -146,16 +147,18 @@ int main(int argc, char* argv[])
     int globalWins = 0;
     int globalTies = 0;
     int globalLosses = 0;
+    int globalNumTests = 0;
 
     int localWins = 0;
     int localTies = 0;
     int localLosses = 0;
+    int localNumTests = 0;
     int result = 0;
     MPI_Datatype resultsDatatype;
     buildResultsDatatype(&localWins, &localTies, &localLosses, &resultsDatatype);
 
     double testStartTime = MPI_Wtime();
-    for(int i = 0; i < NUM_TESTS / p; i++) {
+    while((MPI_Wtime() - testStartTime) < NUM_SEC_TO_RUN) {
         //Although inefficient, this makes the simulation much more realistic
         localDeck = getDeckCopy(masterDeck, getDeckSize(masterDeck) + 1);
         localHand = getRandHand(localDeck, HAND_SIZE);
@@ -172,6 +175,7 @@ int main(int argc, char* argv[])
                 localLosses++;
                 break;
         }
+        localNumTests++;
     }
     double testEndTime = MPI_Wtime();
 
@@ -179,14 +183,14 @@ int main(int argc, char* argv[])
     MPI_Reduce(&localWins, &globalWins, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce(&localLosses, &globalLosses, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce(&localTies, &globalTies, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-
+    MPI_Reduce(&localNumTests, &globalNumTests, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     if(myRank == 0) {
         double programEndTime = MPI_Wtime();
         float winRate = (((float)globalWins)/((float)NUM_TESTS)) * 100.0;
         printf("All done! The master hand was:\n");
         printHand(masterHand, HAND_SIZE);
-        printf("\nOut of %d tests on %d nodes, the hand won %d games, lost %d games and tied %d games.\n Which is a %f percent win rate!\n", NUM_TESTS, p, globalWins, globalLosses, globalTies, winRate);
+        printf("\nOut of %d tests on %d nodes, the hand won %d games, lost %d games and tied %d games.\n Which is a %f percent win rate!\n", globalNumTests, p, globalWins, globalLosses, globalTies, winRate);
         printf("The program took a total of %f seconds to run whereas the tests took %f seconds to run!\n", programEndTime - programStartTime, testEndTime - testStartTime);
     }
 
