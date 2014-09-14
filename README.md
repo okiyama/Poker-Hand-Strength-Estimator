@@ -12,6 +12,7 @@ I tested out using Derived data types to pass the data around as well, but found
 The serial version should work just fine on your computer, and it may even parallelize if you have multiple cores.
 
 You must have mpicc installed, on Ubuntu you can get this with 
+
     sudo apt-get install libopenmpi-dev
     
 After that, you can just make with "make basic" then run with mpirun pokerBasic.
